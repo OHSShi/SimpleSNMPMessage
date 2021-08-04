@@ -1,0 +1,108 @@
+################################################
+# OBJECT SETTING SECTION
+################################################
+#OBJS=ThreadTest.o 
+OBJS=BER.o VB.o PDU.o PDUV2c.o Message.o \
+	 MessageV2c.o SNMPMessage.o SendTrapData.o \
+	 TestVB.o TestBER.o TestPDU.o \
+	 TestMessage.o TestMessageV2c.o TestSNMPMessage.o 
+LIB=libSnmpMessage.a
+INC=
+LINK_LIB=-L. -lSnmpMessage
+		
+
+TEST_MODULE=TestVB TestBER TestPDU \
+			TestMessage TestMessageV2c TestSNMPMessage
+
+#################################################
+# COMMON COMPILE RULES SECTION
+#################################################
+.SUFFIXES: .cpp .c .o .a
+.c:
+		$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+.cpp:
+		$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+.cpp.o:
+		$(CC) -c $(CFLAGS) $(INC) $< -o $@
+.cpp.a:
+		$(CC) -c $(CFLAGS) $(CFLAGS_LIB) $(INC) $< 
+			$(AR) $(ARFLAGS) $@ $*.o
+.c~:
+		$(GET) $(GFLAGS) -p $< > $*.c
+			$(CC) $(CFLAGS) $(LDFLAGS) $*.c -o $@
+				-rm -f $*.c
+.s~.s:
+		$(GET) $(GFLAGS) $<
+.h~.h:
+		$(GET) $(GFLAGS) $<
+.c~.c:
+		$(GET) $(GFLAGS) $<
+
+
+#################################################
+# TARGET SETTING SECTION
+#################################################
+#all: $(TARGET) submod  
+all: $(LIB) $(OBJS) $(TEST_MODULE) 
+
+$(TARGET):$(OBJS)
+		$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(INC) $(LINK_LIB) -o $@ 
+
+$(LIB) : $(LIB)(BER.o) \
+	$(LIB)(VB.o) \
+	$(LIB)(PDU.o) \
+	$(LIB)(PDUV2c.o) \
+	$(LIB)(Message.o) \
+	$(LIB)(MessageV2c.o) \
+	$(LIB)(SNMPMessage.o) \
+	$(LIB)(SendTrapData.o)
+
+
+#TestClient:
+#		$(CC) $(CFLAGS) $(LDFLAGS) TestClient.cpp $(INC) $(LINK_LIB) -o $@
+
+TestVB: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $@.o $(INC) $(LINK_LIB) -o $@
+
+TestBER: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $@.o $(INC) $(LINK_LIB) -o $@
+
+TestPDU: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $@.o $(INC) $(LINK_LIB) -o $@
+
+TestMessage: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $@.o $(INC) $(LINK_LIB) -o $@
+
+TestMessageV2c: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $@.o $(INC) $(LINK_LIB) -o $@
+
+TestSNMPMessage: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $@.o $(INC) $(LINK_LIB) -o $@
+
+makelib:
+	ar rc $(LIB_TARGET) $(LIB_OBJS)
+	#cp *.hpp ../../include 
+	#cp $(LIB_TARGET) ../../lib
+
+#################################################
+# SUBMODULE BUILD SETTING SECTION
+#################################################
+submod:
+
+clean:
+	@rm -f *.o core* $(OBJS) $(LIB) $(TARGET) $(TEST_MODULE)
+	@cd $(LIBDIR); rm -f $(LIB)
+	@cd $(TESTDIR); rm -f $(OBJS)
+#	@cd $(INCDIR); rm -f $(HEADER)
+#
+
+test:
+	echo test
+
+#################################################
+# SUBMODULE CLEAN SETTING SECTION
+#################################################
+install:
+		cp $(TARGET) ../bin
+
+
